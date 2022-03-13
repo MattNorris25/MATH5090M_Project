@@ -1,3 +1,6 @@
+#Time the whole process
+ptm <- proc.time()
+
 #Expected Sample Size, Type I and Type II error code
 Type_I_II_error_and_Expected_Sample_Size = function(lambda, gamma, n1, n2, theta, a0, b0){
   
@@ -89,3 +92,6 @@ for (i in 1:101){
 
 #Outputs the gamma and lambda that minimise the expected sample size, along with the expected sample size itself
 c("Gamma" = gam[ceiling(which.min(SampleSize)/101)], "Lambda" = lamb[which.min(SampleSize)%%101], "Min" = min(SampleSize, na.rm = TRUE))
+
+#Time the whole process
+proc.time() - ptm
