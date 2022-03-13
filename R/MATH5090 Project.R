@@ -54,3 +54,38 @@ Type_I_II_error_and_Expected_Sample_Size = function(lambda, gamma, n1, n2, theta
   #Returns Type I and II error along with expected sample size. (if else statement used in event when no cases reach stage 2)
   return(c("Probability of declaring successful result (Type I error under the null hypothesis)" = ifelse(C1 == 0, 0, 1-(s1 + (1-s1)*s2)),"Probability of failing to declare a successful result (Type II error under the alternative hypothesis)" = ifelse(C1 == 0, 1, s1 + (1-s1)*s2), "Expected Sample Size" = n1*s1+n2*(1-s1)))
 }
+
+#Limits for gamma and lambda in grid search
+lam_min = 0
+lam_max = 1
+gam_min = 0
+gam_max = 10
+
+#Matrices to store Type I and II errors along with Expected sample size for each gamma and lambda
+TypeI = matrix(nrow = 101, ncol = 101)
+TypeII = matrix(nrow = 101, ncol = 101)
+SampleSize = matrix(nrow = 101, ncol = 101)
+
+#Chosen values for sample size in each stage
+n_1 = 15
+n_2 = 40
+
+#Creates sequence of lambda and gamma and names columms and rows using these sequences
+lamb = seq(from = lam_min, to = lam_max, by = (lam_max  - lam_min)/100)
+gam = seq(from = gam_min, to = gam_max, by = (gam_max - gam_min)/100)
+colnames(SampleSize) = colnames(TypeII) = colnames(TypeI) = gam
+rownames(SampleSize) = rownames(TypeII) = rownames(TypeI) = lamb
+
+#Double loop to simulate Type I and Type II errors, if passes criteria expected sample size also 
+for (i in 1:101){
+  for (j in 1:101){
+    TypeI[i,j] = Type_I_II_error_and_Expected_Sample_Size(lambda = lamb[i], gamma = gam[j], n1 = n_1, n2 = n_2, theta = 0.5, a0 = 0.5, b0 = 0.5)[1]
+    TypeII[i,j] = Type_I_II_error_and_Expected_Sample_Size(lambda = lamb[i], gamma = gam[j], n1 = n_1, n2 = n_2, theta = 0.7, a0 = 0.5, b0 = 0.5)[2]
+    if (TypeII[i,j] <= 0.2 & TypeI[i,j] <= 0.05){
+      SampleSize[i,j] = Type_I_II_error_and_Expected_Sample_Size(lambda = lamb[i], gamma = gam[j], n1 = n_1, n2 = n_2, theta = 0.5, a0 = 0.5, b0 = 0.5)[3]
+    }
+  }
+}
+
+#Outputs the gamma and lambda that minimise the expected sample size, along with the expected sample size itself
+c("Gamma" = gam[ceiling(which.min(SampleSize)/101)], "Lambda" = lamb[which.min(SampleSize)%%101], "Min" = min(SampleSize, na.rm = TRUE))
