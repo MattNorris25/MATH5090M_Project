@@ -52,5 +52,5 @@ Type_I_II_error_and_Expected_Sample_Size = function(lambda, gamma, n1, n2, theta
   s2 = sum(Probabilities*does_it_stop_2)
   
   #Returns Type I and II error along with expected sample size. (if else statement used in event when no cases reach stage 2)
-  return(c("Type I error" = ifelse(C1 == 0, 0, 1-(s1 + (1-s1)*s2)),"Type II error" = ifelse(C1 == 0, 1, s1 + (1-s1)*s2), "Expected Sample Size" = n1*s1+n2*(1-s1)))
+  return(c("Probability of declaring successful result (Type I error under the null hypothesis)" = ifelse(C1 == 0, 0, 1-(s1 + (1-s1)*s2)),"Probability of failing to declare a successful result (Type II error under the alternative hypothesis)" = ifelse(C1 == 0, 1, s1 + (1-s1)*s2), "Expected Sample Size" = n1*s1+n2*(1-s1)))
 }
