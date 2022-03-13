@@ -22,28 +22,28 @@ Type_I_II_error_and_Expected_Sample_Size = function(lambda, gamma, n1, n2, theta
   s1 = sum(probabilities_stage_1*does_it_stop_1)
   
   #Probabilities of each outcome in stage 2 ONLY (not including stage 1 events)
-  probabilities_stage_2 = dbinom(y_2squiggles, n2-n1, theta)
+  probabilities_stage_2_only = dbinom(y_2squiggles, n2-n1, theta)
   
-  #Matrix to calculate probabilities of each event happening
+  #Matrix to store probabilities of every combination of events (i.e. P(y1 = i)*P(y2squiggle = j))
   prob = matrix(nrow = n1 + 1, ncol = n2 - n1 + 1)
   
   #Calculating the probabilities of every combination of events (i.e. P(y1 = i)*P(y2squiggle = j)) and removing the events when stage 2 is not reached
   for (i in 1:(n1+1)){
     for(j in 1:(n2-n1+1)){
-      prob[i,j] = probabilities_stage_1[i]*probabilities_stage_2[j]*(1-does_it_stop_1[i])
+      prob[i,j] = probabilities_stage_1[i]*probabilities_stage_2_only[j]*(1-does_it_stop_1[i])
     }
   }
   
-  #Creating vector to store probabilities
-  Probabilities = rep(0, n2+1)
+  #Creating vector to store probabilities P(y1 + y2squiggle = i)
+  probabilities_stage_2 = rep(0, n2+1)
   
   #Calculating the probabilities P(y1 + y2squiggle = i)
   for(i in 1:(n2+1)){
-    Probabilities[i] = sum(prob[c(row(prob) + col(prob) == i + 1)]) 
+    probabilities_stage_2[i] = sum(prob[c(row(prob) + col(prob) == i + 1)]) 
   }
   
   #Calculating P(y1 + y2squiggle = i)/P(stage 2 reached) i.e. conditional probability of i successes given stage 2 is reached
-  Probabilities = Probabilities/sum(probabilities_stage_1*(1-does_it_stop_1))
+  probabilities_stage_2 = probabilities_stage_2/sum(probabilities_stage_1*(1-does_it_stop_1))
   
   #Progression threshold for stage 2
   C2 = 1 - lambda * (n2 / n2)^gamma
@@ -52,7 +52,7 @@ Type_I_II_error_and_Expected_Sample_Size = function(lambda, gamma, n1, n2, theta
   does_it_stop_2 = pbeta(0.5, a0 + y_2s, b0 + n2 - y_2s) > C2
   
   #Probability of stopping in stage 2
-  s2 = sum(Probabilities*does_it_stop_2)
+  s2 = sum(probabilities_stage_2*does_it_stop_2)
   
   #Returns Type I and II error along with expected sample size. (if else statement used in event when no cases reach stage 2)
   return(c("Probability of declaring successful result (Type I error under the null hypothesis)" = ifelse(C1 == 0, 0, 1-(s1 + (1-s1)*s2)),"Probability of failing to declare a successful result (Type II error under the alternative hypothesis)" = ifelse(C1 == 0, 1, s1 + (1-s1)*s2), "Expected Sample Size" = n1*s1+n2*(1-s1)))
@@ -70,8 +70,8 @@ TypeII = matrix(nrow = 101, ncol = 101)
 SampleSize = matrix(nrow = 101, ncol = 101)
 
 #Chosen values for sample size in each stage
-n_1 = 15
-n_2 = 40
+n_1 = 25
+n_2 = 80
 
 #Creates sequence of lambda and gamma and names columms and rows using these sequences
 lamb = seq(from = lam_min, to = lam_max, by = (lam_max  - lam_min)/100)
