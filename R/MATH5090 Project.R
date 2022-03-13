@@ -1,4 +1,4 @@
-#Time the whole process
+#Time how long it takes to find optimal design
 ptm <- proc.time()
 
 #Expected Sample Size, Type I and Type II error code
@@ -102,7 +102,21 @@ Grid_Search = function(h0, h1, n1, n2){
 }
 
 #Optimal solution after testing several different values of n1 and n2 
-Grid_Search(0.5, 0.7, 25, 80)
+Grid_Search(h0 = 0.5, h1 = 0.7, n1 = 25, n2 = 80)
 
-#Time the whole process
+#Time how long it takes to find optimal design
 proc.time() - ptm
+
+#Create a range of H1 values to test
+H1_s = seq(from = 0.7, to = 0.95, by = 0.025)
+
+#Create a vector to store minimum expected sample sizes for different alternative hypotheses
+MESS = rep(NA, 11)
+
+#Apply grid search to range of H1 values
+for(i in 1:11){
+ MESS[i] = Grid_Search(h0 = 0.5, h1 = H1_s[i], n1 = 15, n2 = 40)[3]
+}
+
+#Plot minimum expected sample size against value of H1
+plot(H1_s, MESS, ylab = "Minimum expected sample size", xlab = "Theta value for alternative hypothesis")
