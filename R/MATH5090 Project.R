@@ -90,8 +90,12 @@ for (i in 1:101){
   }
 }
 
-#Outputs the gamma and lambda that minimise the expected sample size, along with the expected sample size itself
-c("Gamma" = gam[ceiling(which.min(SampleSize)/101)], "Lambda" = lamb[which.min(SampleSize)%%101], "Min" = min(SampleSize, na.rm = TRUE))
+#If a solution is found, outputs the gamma and lambda that minimise the expected sample size, along with the expected sample size itself
+if(all(is.na(SampleSize))){
+  "No solution"
+}else{
+  c("Gamma" = gam[ceiling(which.min(SampleSize)/101)], "Lambda" = lamb[which.min(SampleSize)%%101], "Min" = min(SampleSize, na.rm = TRUE))
+}
 
 #Time the whole process
 proc.time() - ptm
