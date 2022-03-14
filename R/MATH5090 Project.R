@@ -1,6 +1,3 @@
-#Time how long it takes to find optimal design
-ptm <- proc.time()
-
 #Probabilities of each outcome in stage 1 function
 stage_1_probabilities = function(n1, theta){
   y_1s = 0:n1
@@ -157,6 +154,9 @@ Grid_Search = function(h0, h1, n1, n2){
   }
   
 }
+
+#Time how long it takes to find optimal design
+ptm <- proc.time()
 
 #Optimal solution after testing several different values of n1 and n2 
 Grid_Search(h0 = 0.5, h1 = 0.7, n1 = 25, n2 = 80)
