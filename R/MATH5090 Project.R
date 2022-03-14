@@ -1,9 +1,25 @@
 #Time how long it takes to find optimal design
 ptm <- proc.time()
 
-#Expected Sample Size, Type I and Type II error code
-Type_I_II_error_and_Expected_Sample_Size = function(lambda, gamma, n1, n2, theta, a0, b0){
-  
+#Probabilities of each outcome in stage 1 function
+stage_1_probabilities = function(n1, theta){
+  y_1s = 0:n1
+  return(dbinom(y_1s, n1, theta))
+}
+
+#Unit test for stage 1 probability function
+test_stage_1_probabilites = function(){
+  n1 = 30
+  theta = 0.5
+  s = sum(stage_1_probabilities(n1, theta))
+  return(all.equal(s,1))
+}
+
+#Runs test
+test_stage_1_probabilites()
+
+#Probabilities of each outcome in stage 2 function
+stage_2_probabilities = function(n1, n2, theta, lambda, gamma, a0, b0){
   #All possible outcomes in stage 1, stage 2 and combined  
   y_1s = 0:n1
   y_2squiggles = 0:(n2-n1)
@@ -16,7 +32,7 @@ Type_I_II_error_and_Expected_Sample_Size = function(lambda, gamma, n1, n2, theta
   does_it_stop_1 = pbeta(0.5, a0 + y_1s, b0 + n1 - y_1s) > C1
   
   #Probabilities of each outcome in stage 1
-  probabilities_stage_1 = dbinom(y_1s, n1, theta)
+  probabilities_stage_1 = stage_1_probabilities(n1 = n1, theta = theta)
   
   #Probability of stopping in stage 1
   s1 = sum(probabilities_stage_1*does_it_stop_1)
@@ -44,6 +60,45 @@ Type_I_II_error_and_Expected_Sample_Size = function(lambda, gamma, n1, n2, theta
   
   #Calculating P(y1 + y2squiggle = i)/P(stage 2 reached) i.e. conditional probability of i successes given stage 2 is reached
   probabilities_stage_2 = probabilities_stage_2/sum(probabilities_stage_1*(1-does_it_stop_1))
+
+  return(probabilities_stage_2)
+}
+
+#Unit test for stage 2 probability function
+test_stage_2_probabilites = function(){
+  n1 = 30
+  n2 = 60
+  theta = 0.5
+  lambda = 0.2
+  gamma = 0.8
+  a0 = 0.5
+  b0 = 0.5
+  s = sum(stage_2_probabilities(n1, n2, theta, lambda, gamma, a0, b0))
+  return(all.equal(s,1))
+}
+
+#Runs test
+test_stage_2_probabilites()
+
+#Expected Sample Size, Type I and Type II error code
+Type_I_II_error_and_Expected_Sample_Size = function(lambda, gamma, n1, n2, theta, a0, b0){
+  
+  #All possible outcomes in stage 1, stage 2 and combined  
+  y_1s = 0:n1
+  y_2squiggles = 0:(n2-n1)
+  y_2s = 0:n2
+  
+  #Progression threshold for stage 1
+  C1 = 1 - lambda * (n1 / n2)^gamma
+  
+  #Decision for each possible case in stage 1
+  does_it_stop_1 = pbeta(0.5, a0 + y_1s, b0 + n1 - y_1s) > C1
+  
+  #Probabilities of each outcome in stage 1
+  probabilities_stage_1 = stage_1_probabilities(n1 = n1, theta = theta)
+  
+  #Probability of stopping in stage 1
+  s1 = sum(probabilities_stage_1*does_it_stop_1)
   
   #Progression threshold for stage 2
   C2 = 1 - lambda * (n2 / n2)^gamma
@@ -51,6 +106,8 @@ Type_I_II_error_and_Expected_Sample_Size = function(lambda, gamma, n1, n2, theta
   #Decision for each possible case in stage 2
   does_it_stop_2 = pbeta(0.5, a0 + y_2s, b0 + n2 - y_2s) > C2
   
+  #Probabilities of each outcome in stage 2
+  probabilities_stage_2 = stage_2_probabilities(n1 = n1, n2 = n2, theta = theta, gamma = gamma, lambda = lambda, a0 = a0, b0 = b0)
   #Probability of stopping in stage 2
   s2 = sum(probabilities_stage_2*does_it_stop_2)
   
