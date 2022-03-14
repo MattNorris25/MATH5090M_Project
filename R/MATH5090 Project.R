@@ -107,6 +107,9 @@ Grid_Search(h0 = 0.5, h1 = 0.7, n1 = 25, n2 = 80)
 #Time how long it takes to find optimal design
 proc.time() - ptm
 
+
+#EVALUATION CODE
+
 #Create a range of H1 values to test
 H1_s = seq(from = 0.7, to = 0.95, by = 0.025)
 
