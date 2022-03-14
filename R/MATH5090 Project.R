@@ -167,6 +167,9 @@ proc.time() - ptm
 
 #EVALUATION CODE
 
+#Showing that theta values less than 0.7 for the alternative hypothesis return no solution
+Grid_Search(0.5, 0.675, 15, 40)
+
 #Create a range of H1 values to test
 H1_s = seq(from = 0.7, to = 0.95, by = 0.025)
 
